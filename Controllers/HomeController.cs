@@ -47,14 +47,12 @@ namespace PDFtoExcel.Controllers
         public IEnumerable<FileDto> GetFiles()
         {
 
-            var files = (_repository.GetFiles())
-                        .Select(file => file.AsDto());
+            var files = _repository.GetFiles().Select(file => file.AsDto());
             return files;
         }
 
         // GET /{id}
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("{id}")]
         public ActionResult<FileDto> GetFile(int id)
         {
 
