@@ -14,6 +14,6 @@ namespace PDFtoExcel.Data
 
         }
 
-        public DbSet<File> Files { set; get; }
+        public DbSet<LocalFile> Files { set; get; }
     }
 }

@@ -25,6 +25,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Controllers\" />
+	  <Folder Include="wwwroot\converts\" />
 	  <Folder Include="wwwroot\uploads\" />
 	</ItemGroup>
 

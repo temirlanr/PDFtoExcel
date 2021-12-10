@@ -9,6 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using PDFtoExcel.Data;
+using PDFtoExcel.Dtos;
+using Aspose.Pdf;
 
 namespace PDFtoExcel.Controllers
 {
@@ -35,31 +37,73 @@ namespace PDFtoExcel.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
         public IActionResult Convert()
         {
-            return base.View(new Models.File());
+            return base.View(new LocalFile());
         }
 
-        [HttpPost]
-        public IActionResult Convert(Models.File model)
+        // GET 
+        [HttpGet]
+        public IEnumerable<FileDto> GetFiles()
         {
-            // do other validations on your model as needed
+
+            var files = (_repository.GetFiles())
+                        .Select(file => file.AsDto());
+            return files;
+        }
+
+        // GET /{id}
+        [HttpGet]
+        [Route("{id}")]
+        public ActionResult<FileDto> GetFile(int id)
+        {
+
+            var file = _repository.GetFile(id);
+
+            if (file is null)
+            {
+                return NotFound();
+            }
+
+            return file.AsDto();
+        }
+
+        // POST
+        [HttpPost]
+        public ActionResult<FileDto> Convert(LocalFile model)
+        {
+            // TO DO - other validations
             if (model.MyFile != null)
             {
                 var uniqueFileName = GetUniqueFileName(model.MyFile.FileName);
                 var uploads = Path.Combine(hostingEnvironment.WebRootPath, "uploads");
+                var converts = Path.Combine(hostingEnvironment.WebRootPath, "converts");
                 var filePath = Path.Combine(uploads, uniqueFileName);
+                string excelFileName = uniqueFileName.Replace(".pdf", ".xlsx");
+                string excelFileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                var excelPath = Path.Combine(converts, excelFileName);
                 model.MyFile.CopyTo(new FileStream(filePath, FileMode.Create));
 
-                //to do : Save uniqueFileName  to your db table   
+                Stream stream = model.MyFile.OpenReadStream();
+                Document pdfDocument = new(stream);
+                ExcelSaveOptions excelsave = new();
+                pdfDocument.Save(excelPath, excelsave);
+
+                LocalFile file = new()
+                {
+                    Id = model.Id,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    MyFileName = model.MyFile.FileName
+                };
+
+                _repository.CreateFile(file);
+                _repository.SaveChanges();
+
+                return PhysicalFile(excelPath, excelFileType, excelFileName);
             }
-            // to do  : Return something
-            return RedirectToAction("Index", "Home");
+
+            return RedirectToAction("Error", "Home");
         }
         private string GetUniqueFileName(string fileName)
         {

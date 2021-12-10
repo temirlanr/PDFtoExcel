@@ -8,7 +8,7 @@ using PDFtoExcel.Data;
 namespace PDFtoExcel.Migrations
 {
     [DbContext(typeof(FilesContext))]
-    [Migration("20211210124348_testMigration")]
+    [Migration("20211210130047_testMigration")]
     partial class testMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -15,24 +15,24 @@ namespace PDFtoExcel.Data
             _context = context;
         }
 
-        public void Convert(File file)
+        public void CreateFile(LocalFile file)
         {
-            throw new NotImplementedException();
+            _context.Files.Add(file);
         }
 
-        public File GetFile(int id)
+        public LocalFile GetFile(int id)
         {
-            throw new NotImplementedException();
+            return _context.Files.FirstOrDefault(f => f.Id == id);
         }
 
-        public IEnumerable<File> GetFiles()
+        public IEnumerable<LocalFile> GetFiles()
         {
-            throw new NotImplementedException();
+            return _context.Files.ToList();
         }
 
         public bool SaveChanges()
         {
-            throw new NotImplementedException();
+            return (_context.SaveChanges() >= 0);
         }
     }
 }
