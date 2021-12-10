@@ -1,0 +1,16 @@
+﻿@model File
+
+@{ 
+    ViewData["Title"] = "Convert";
+}
+
+<h1>Convert</h1>
+
+<form asp-action="Convert" enctype="multipart/form-data">
+
+    <input asp-for="FirstName" placeholder="Your first name"/>
+    <input asp-for="LastName" placeholder="Your last name"/>
+    <input asp-for="MyFile" />
+
+    <input type="submit" />
+</form>
