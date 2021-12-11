@@ -18,9 +18,9 @@ namespace PDFtoExcel.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IFilesRepo _repository;
-        private readonly IHostingEnvironment hostingEnvironment;
+        private readonly IWebHostEnvironment hostingEnvironment;
 
-        public HomeController(ILogger<HomeController> logger, IFilesRepo repository, IHostingEnvironment environment)
+        public HomeController(ILogger<HomeController> logger, IFilesRepo repository, IWebHostEnvironment environment)
         {
             _logger = logger;
             _repository = repository;
@@ -44,6 +44,7 @@ namespace PDFtoExcel.Controllers
 
         // GET 
         [HttpGet]
+        [Route("/api/")]
         public IEnumerable<FileDto> GetFiles()
         {
 
@@ -52,7 +53,8 @@ namespace PDFtoExcel.Controllers
         }
 
         // GET /{id}
-        [HttpGet("{id}")]
+        [HttpGet]
+        [Route("/api/{id}")]
         public ActionResult<FileDto> GetFile(int id)
         {
 
@@ -70,9 +72,15 @@ namespace PDFtoExcel.Controllers
         [HttpPost]
         public ActionResult<FileDto> Convert(LocalFile model)
         {
-            // TO DO - other validations
+            
             if (model.MyFile != null)
             {
+
+                if (Path.GetExtension(model.MyFile.FileName) != ".pdf")
+                {
+                    return RedirectToAction("Convert", "Home");
+                }
+
                 var uniqueFileName = GetUniqueFileName(model.MyFile.FileName);
                 var uploads = Path.Combine(hostingEnvironment.WebRootPath, "uploads");
                 var converts = Path.Combine(hostingEnvironment.WebRootPath, "converts");
@@ -101,7 +109,7 @@ namespace PDFtoExcel.Controllers
                 return PhysicalFile(excelPath, excelFileType, excelFileName);
             }
 
-            return RedirectToAction("Error", "Home");
+            return RedirectToAction("Convert", "Home");
         }
         private string GetUniqueFileName(string fileName)
         {

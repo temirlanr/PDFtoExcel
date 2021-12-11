@@ -28,11 +28,6 @@ namespace PDFtoExcel
         {
             services.AddControllersWithViews();
             services.AddDbContext<FilesContext>(opt => opt.UseMySQL(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllers().AddNewtonsoftJson(s =>
-            {
-                s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-            });
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IFilesRepo, SqlFilesRepo>();
         }
 
