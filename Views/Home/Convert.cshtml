@@ -8,9 +8,9 @@
 
 <form asp-action="Convert" enctype="multipart/form-data">
 
-    <input asp-for="FirstName" placeholder="Your first name"/>
-    <input asp-for="LastName" placeholder="Your last name"/>
-    <input asp-for="MyFile" />
+    <input asp-for="FirstName" placeholder="Your first name" required/>
+    <input asp-for="LastName" placeholder="Your last name" required/>
+    <input asp-for="MyFile" required/>
 
     <input type="submit" />
 </form>

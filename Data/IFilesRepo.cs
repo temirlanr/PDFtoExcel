@@ -10,8 +10,8 @@ namespace PDFtoExcel.Data
     {
         bool SaveChanges();
 
-        IEnumerable<LocalFile> GetFiles();
-        LocalFile GetFile(int id);
-        void CreateFile(LocalFile file);
+        Task<IEnumerable<LocalFile>> GetFilesAsync();
+        Task<LocalFile> GetFileAsync(int id);
+        Task CreateFileAsync(LocalFile file);
     }
 }

@@ -18,18 +18,18 @@ namespace PDFtoExcel.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IFilesRepo _repository;
-        private readonly IWebHostEnvironment hostingEnvironment;
+        private readonly IWebHostEnvironment _environment;
 
         public HomeController(ILogger<HomeController> logger, IFilesRepo repository, IWebHostEnvironment environment)
         {
             _logger = logger;
             _repository = repository;
-            hostingEnvironment = environment;
+            _environment = environment;
         }
 
-        public IActionResult List()
+        public async Task<IActionResult> ListAsync()
         {
-            return View(_repository.GetFiles());
+            return View(await _repository.GetFilesAsync());
         }
 
         public IActionResult Index()
@@ -39,26 +39,26 @@ namespace PDFtoExcel.Controllers
 
         public IActionResult Convert()
         {
-            return base.View(new LocalFile());
+            return View(new LocalFile());
         }
 
         // GET 
         [HttpGet]
         [Route("/api/")]
-        public IEnumerable<FileDto> GetFiles()
+        public async Task<IEnumerable<FileDto>> GetFilesAsync()
         {
 
-            var files = _repository.GetFiles().Select(file => file.AsDto());
+            var files = (await _repository.GetFilesAsync()).Select(file => file.AsDto());
             return files;
         }
 
         // GET /{id}
         [HttpGet]
         [Route("/api/{id}")]
-        public ActionResult<FileDto> GetFile(int id)
+        public async Task<ActionResult<FileDto>> GetFileAsync(int id)
         {
 
-            var file = _repository.GetFile(id);
+            var file = await _repository.GetFileAsync(id);
 
             if (file is null)
             {
@@ -70,7 +70,7 @@ namespace PDFtoExcel.Controllers
 
         // POST
         [HttpPost]
-        public ActionResult<FileDto> Convert(LocalFile model)
+        public async Task<ActionResult<FileDto>> ConvertAsync(LocalFile model)
         {
             
             if (model.MyFile != null)
@@ -78,12 +78,13 @@ namespace PDFtoExcel.Controllers
 
                 if (Path.GetExtension(model.MyFile.FileName) != ".pdf")
                 {
+                    _logger.LogWarning("NotPDF");
                     return RedirectToAction("Convert", "Home");
                 }
 
                 var uniqueFileName = GetUniqueFileName(model.MyFile.FileName);
-                var uploads = Path.Combine(hostingEnvironment.WebRootPath, "uploads");
-                var converts = Path.Combine(hostingEnvironment.WebRootPath, "converts");
+                var uploads = Path.Combine(_environment.WebRootPath, "uploads");
+                var converts = Path.Combine(_environment.WebRootPath, "converts");
                 var filePath = Path.Combine(uploads, uniqueFileName);
                 string excelFileName = uniqueFileName.Replace(".pdf", ".xlsx");
                 string excelFileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -103,12 +104,13 @@ namespace PDFtoExcel.Controllers
                     MyFileName = model.MyFile.FileName
                 };
 
-                _repository.CreateFile(file);
+                await _repository.CreateFileAsync(file);
                 _repository.SaveChanges();
 
                 return PhysicalFile(excelPath, excelFileType, excelFileName);
             }
 
+            _logger.LogWarning("NullFile");
             return RedirectToAction("Convert", "Home");
         }
         private string GetUniqueFileName(string fileName)

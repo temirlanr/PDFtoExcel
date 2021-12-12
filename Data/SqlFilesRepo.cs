@@ -15,19 +15,20 @@ namespace PDFtoExcel.Data
             _context = context;
         }
 
-        public void CreateFile(LocalFile file)
+        public async Task CreateFileAsync(LocalFile file)
         {
             _context.Files.Add(file);
+            await Task.CompletedTask;
         }
 
-        public LocalFile GetFile(int id)
+        public async Task<LocalFile> GetFileAsync(int id)
         {
-            return _context.Files.FirstOrDefault(f => f.Id == id);
+            return await Task.FromResult(_context.Files.FirstOrDefault(f => f.Id == id));
         }
 
-        public IEnumerable<LocalFile> GetFiles()
+        public async Task<IEnumerable<LocalFile>> GetFilesAsync()
         {
-            return _context.Files.ToList();
+            return await Task.FromResult(_context.Files.ToList());
         }
 
         public bool SaveChanges()
